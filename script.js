@@ -1,39 +1,49 @@
-* {
-  box-sizing: border-box;
-}
+const button = document.getElementById('uploadBtn');
+const canvas = document.getElementById('riveCanvas');
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  background: rgb(0, 110, 255);
-  font-family: Arial, sans-serif;
-}
+const riveFile = new rive.Rive({
+  src: './rocket-ship-animation.riv',
+  canvas: canvas,
+  autoplay: true,
+  stateMachines: 'State Machine 1',
+  fit: rive.Fit.contain,
+  onLoad: () => {
+    riveFile.resizeDrawingSurfaceToCanvas();
 
-.wrap {
-  position: relative;
-  width: min(90vw, 520px);
-  height: min(90vw, 520px);
-}
+    const inputs = riveFile.stateMachineInputs('State Machine 1');
+    const trigger = inputs.find((input) => input.name === 'Trigger 2');
 
-canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
+    if (!trigger) {
+      button.textContent = 'Trigger not found';
+      return;
+    }
 
-button {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  border: 0;
-  border-radius: 10px;
-  padding: 14px 24px;
-  background: white;
-  color: black;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-}
+    button.addEventListener('click', () => {
+      trigger.fire();
+    });
+  },
+  onStateChange: (event) => {
+    const state = event?.data?.[0];
+    if (!state) return;
+
+    if (state === 'Fireup' || state === 'Flying') {
+      button.textContent = 'Uploading...';
+      button.style.background = 'rgba(255,255,255,.6)';
+      document.body.style.background = '#8cbdff';
+    }
+
+    if (state === 'Firedown') {
+      button.textContent = 'Finished!';
+
+      setTimeout(() => {
+        button.textContent = 'Upload File';
+        button.style.background = 'white';
+        document.body.style.background = 'rgb(0, 110, 255)';
+      }, 1000);
+    }
+  },
+});
+
+window.addEventListener('resize', () => {
+  riveFile.resizeDrawingSurfaceToCanvas();
+});
