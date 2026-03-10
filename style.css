@@ -14,7 +14,7 @@ body {
 .wrap {
   position: relative;
   width: min(90vw, 520px);
-  aspect-ratio: 1 / 1;
+  height: min(90vw, 520px);
 }
 
 canvas {
@@ -36,8 +36,4 @@ button {
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-}
-
-button:disabled {
-  cursor: default;
 }
